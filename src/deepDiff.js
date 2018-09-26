@@ -5,6 +5,7 @@ import _union from 'lodash.union'
 import _filter from 'lodash.filter'
 import _every from 'lodash.every'
 import _pick from 'lodash.pick'
+import {Iterable} from 'immutable'
 
 export const DIFF_TYPES = {
   UNAVOIDABLE: 'unavoidable',
@@ -14,6 +15,14 @@ export const DIFF_TYPES = {
 }
 
 export const classifyDiff = (prev, next, name) => {
+
+  if (Iterable.isIterable(prev)) {
+    prev = prev.toJS();
+  }
+  if (Iterable.isIterable(next)) {
+    next = next.toJS();
+  }
+
   if (prev === next) {
     return {
       type: DIFF_TYPES.SAME,
