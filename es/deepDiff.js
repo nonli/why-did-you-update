@@ -51,7 +51,9 @@ export var classifyDiff = function classifyDiff(prev, next, name) {
   }
 
   var isChanged = function isChanged(key) {
-    return prev[key] !== next[key] && !_isEqual(prev[key], next[key]);
+    var prevValue = Iterable.isIterable(prev[key]) ? prev[key].toJS() : prev[key];
+    var nextValue = Iterable.isIterable(next[key]) ? next[key].toJS() : next[key];
+    return prevValue !== nextValue && !_isEqual(prevValue, nextValue);
   };
   var isSameFunction = function isSameFunction(key) {
     var prevFn = prev[key];
@@ -60,7 +62,7 @@ export var classifyDiff = function classifyDiff(prev, next, name) {
   };
 
   var keys = _union(_keys(prev), _keys(next));
-  var changedKeys = _filter(keys, isChanged);
+  var changedKeys = _filter(Iterable.isIterable(keys) ? keys.toJS() : keys, isChanged);
 
   if (changedKeys.length && _every(changedKeys, isSameFunction)) {
     return {

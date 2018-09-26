@@ -50,7 +50,11 @@ export const classifyDiff = (prev, next, name) => {
     }
   }
 
-  const isChanged = key => (prev[key] !== next[key]) && (!_isEqual(prev[key], next[key]));
+  const isChanged = key => {
+    const prevValue = Iterable.isIterable(prev[key]) ? prev[key].toJS() : prev[key];
+    const nextValue = Iterable.isIterable(next[key]) ? next[key].toJS() : next[key];
+    return (prevValue !== nextValue) && (!_isEqual(prevValue, nextValue))
+  };
   const isSameFunction = key => {
     const prevFn = prev[key];
     const nextFn = next[key];
@@ -58,7 +62,10 @@ export const classifyDiff = (prev, next, name) => {
   };
 
   const keys = _union(_keys(prev), _keys(next));
-  const changedKeys = _filter(keys, isChanged);
+  const changedKeys = _filter(
+    Iterable.isIterable(keys) ? keys.toJS() : keys,
+    isChanged
+  );
 
   if (changedKeys.length && _every(changedKeys, isSameFunction)) {
     return {
